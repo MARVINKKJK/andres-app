@@ -9,93 +9,94 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="ANDRES">
   <meta name="format-detection" content="telephone=no">
-
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-
   <title>ANDRES</title>
-
   <style>
-    * { box-sizing: border-box; }
+    :root { --app-height: 100dvh; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     html, body {
       margin: 0;
       width: 100%;
       height: 100%;
+      min-height: 100%;
       overflow: hidden;
+      overscroll-behavior: none;
       background: #232B36;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
     }
-
+    body { position: fixed; inset: 0; }
     #appShell {
       position: fixed;
       inset: 0;
-      background: #fff;
+      height: var(--app-height);
+      background: #232B36;
       padding-top: env(safe-area-inset-top);
       padding-right: env(safe-area-inset-right);
       padding-bottom: env(safe-area-inset-bottom);
       padding-left: env(safe-area-inset-left);
     }
-
+    #frameWrap {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #f6f8fb;
+      border-radius: 0;
+    }
     #andresFrame {
       width: 100%;
       height: 100%;
       border: 0;
       display: block;
-      background: #fff;
+      background: #f6f8fb;
     }
-
-    #splash {
+    #splash, #pageLoader {
       position: fixed;
       inset: 0;
       z-index: 9999;
-      background: #232B36;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: opacity .25s ease;
+      background: #232B36;
       padding:
         calc(24px + env(safe-area-inset-top))
         calc(24px + env(safe-area-inset-right))
         calc(24px + env(safe-area-inset-bottom))
         calc(24px + env(safe-area-inset-left));
+      transition: opacity .2s ease, visibility .2s ease;
     }
-
-    #splash.hide {
+    #pageLoader { z-index: 9998; background: rgba(35,43,54,.94); }
+    #splash.hide, #pageLoader.hide {
       opacity: 0;
+      visibility: hidden;
       pointer-events: none;
     }
-
-    .splash-inner {
-      text-align: center;
-      color: #fff;
-    }
-
-    .splash-inner img {
-      width: min(340px, 78vw);
-      height: auto;
+    .loader-inner { text-align: center; color: #fff; }
+    .loader-inner img {
+      width: min(330px, 76vw);
+      max-height: 120px;
+      object-fit: contain;
       display: block;
-      margin: 0 auto 24px;
+      margin: 0 auto 22px;
     }
-
     .spinner {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       margin: 0 auto;
-      border: 3px solid rgba(255,255,255,.28);
+      border: 3px solid rgba(255,255,255,.25);
       border-top-color: #fff;
       border-radius: 50%;
-      animation: spin .8s linear infinite;
+      animation: spin .75s linear infinite;
     }
-
     .loading {
       margin-top: 14px;
       font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .2px;
       color: #d0d5dd;
     }
-
     @keyframes spin { to { transform: rotate(360deg); } }
-
     #offline {
       position: fixed;
       inset: 0;
@@ -105,90 +106,89 @@
       justify-content: center;
       background: #f6f8fb;
       color: #232B36;
-      padding: 32px;
+      padding: calc(28px + env(safe-area-inset-top)) 28px calc(28px + env(safe-area-inset-bottom));
       text-align: center;
     }
-
     #offline.show { display: flex; }
-
-    .offline-card {
-      max-width: 420px;
-    }
-
+    .offline-card { width: min(430px, 100%); }
     .offline-card img {
-      width: min(300px, 75vw);
+      width: min(290px, 72vw);
       background: #232B36;
-      border-radius: 18px;
+      border-radius: 20px;
       padding: 18px;
       margin-bottom: 24px;
     }
-
-    .offline-card h2 {
-      margin: 0 0 12px;
-      font-size: 24px;
-    }
-
-    .offline-card p {
-      color: #667085;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
+    .offline-card h2 { margin: 0 0 10px; font-size: 23px; }
+    .offline-card p { margin: 0 0 22px; color: #667085; line-height: 1.5; font-size: 14px; }
     .offline-card button {
+      min-height: 50px;
       border: 0;
       background: #073763;
       color: #fff;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 13px 22px;
+      font-weight: 800;
+      border-radius: 12px;
+      padding: 0 24px;
       cursor: pointer;
+      touch-action: manipulation;
     }
-
     #installHelp {
       position: fixed;
-      left: 14px;
-      right: 14px;
+      left: max(14px, env(safe-area-inset-left));
+      right: max(14px, env(safe-area-inset-right));
       bottom: calc(14px + env(safe-area-inset-bottom));
       z-index: 10001;
-      background: rgba(35,43,54,.97);
+      background: rgba(35,43,54,.98);
       color: #fff;
-      border-radius: 16px;
-      padding: 14px 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 15px 16px;
+      box-shadow: 0 14px 38px rgba(0,0,0,.30);
       display: none;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.45;
     }
-
-    #installHelp strong { display: block; margin-bottom: 3px; }
+    #installHelp strong { display: block; margin-bottom: 4px; font-size: 14px; }
     #installHelp button {
-      margin-top: 10px;
+      min-height: 42px;
+      margin-top: 11px;
       border: 0;
-      border-radius: 9px;
-      padding: 9px 12px;
-      font-weight: 700;
+      border-radius: 10px;
+      padding: 0 14px;
+      font-weight: 800;
       background: #fff;
       color: #232B36;
+      touch-action: manipulation;
+    }
+    @media (min-width: 900px) {
+      #frameWrap { max-width: 1800px; margin: 0 auto; }
     }
   </style>
 </head>
-
 <body>
   <div id="appShell">
-    <iframe
-      id="andresFrame"
-      src="https://script.google.com/macros/s/AKfycbx3qZbKx73FNVC9DpXNiIbj1SGtlGETRpYR2mJUIVrPndJ-Hz__J5LVzHq_yhNeczy_/exec"
-      allow="geolocation; camera; microphone; clipboard-read; clipboard-write"
-      referrerpolicy="strict-origin-when-cross-origin"
-      title="ANDRES">
-    </iframe>
+    <div id="frameWrap">
+      <iframe
+        id="andresFrame"
+        src="https://script.google.com/macros/s/AKfycbx3qZbKx73FNVC9DpXNiIbj1SGtlGETRpYR2mJUIVrPndJ-Hz__J5LVzHq_yhNeczy_/exec"
+        allow="geolocation *; camera *; microphone *; clipboard-read *; clipboard-write *"
+        referrerpolicy="strict-origin-when-cross-origin"
+        title="ANDRES">
+      </iframe>
+    </div>
   </div>
 
   <div id="splash">
-    <div class="splash-inner">
+    <div class="loader-inner">
       <img src="icons/icon-512.png" alt="ANDRES">
       <div class="spinner"></div>
       <div class="loading">Cargando sistema institucional…</div>
+    </div>
+  </div>
+
+  <div id="pageLoader" class="hide">
+    <div class="loader-inner">
+      <div class="spinner"></div>
+      <div class="loading">Abriendo…</div>
     </div>
   </div>
 
@@ -196,8 +196,8 @@
     <div class="offline-card">
       <img src="icons/icon-512.png" alt="ANDRES">
       <h2>Sin conexión a Internet</h2>
-      <p>ANDRES necesita conexión para acceder al sistema y sincronizar la información.</p>
-      <button type="button" onclick="location.reload()">REINTENTAR</button>
+      <p>Verifique su conexión para continuar utilizando el Sistema ANDRES.</p>
+      <button type="button" id="retryButton">REINTENTAR</button>
     </div>
   </div>
 
@@ -208,14 +208,22 @@
   </div>
 
   <script>
+    const APP_URL = 'https://script.google.com/macros/s/AKfycbx3qZbKx73FNVC9DpXNiIbj1SGtlGETRpYR2mJUIVrPndJ-Hz__J5LVzHq_yhNeczy_/exec';
+    const APP_PATH = new URL(APP_URL).pathname;
     const splash = document.getElementById('splash');
+    const pageLoader = document.getElementById('pageLoader');
     const offline = document.getElementById('offline');
     const frame = document.getElementById('andresFrame');
     const installHelp = document.getElementById('installHelp');
     const installText = document.getElementById('installText');
     const installButton = document.getElementById('installButton');
-
+    const retryButton = document.getElementById('retryButton');
     let deferredPrompt = null;
+
+    function syncViewportHeight() {
+      const h = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+      document.documentElement.style.setProperty('--app-height', h + 'px');
+    }
 
     function isStandalone() {
       return window.matchMedia('(display-mode: standalone)').matches ||
@@ -226,36 +234,89 @@
       return /iphone|ipad|ipod/i.test(navigator.userAgent);
     }
 
-    function updateConnection() {
-      if (navigator.onLine) {
-        offline.classList.remove('show');
-      } else {
-        offline.classList.add('show');
+    function isAllowedAndresUrl(value) {
+      try {
+        const url = new URL(String(value || ''));
+        return url.protocol === 'https:' &&
+               url.hostname === 'script.google.com' &&
+               url.pathname === APP_PATH;
+      } catch (e) {
+        return false;
       }
     }
 
-    window.addEventListener('online', updateConnection);
-    window.addEventListener('offline', updateConnection);
-    updateConnection();
+    function showPageLoader() {
+      pageLoader.classList.remove('hide');
+    }
 
-    frame.addEventListener('load', () => {
-      setTimeout(() => splash.classList.add('hide'), 350);
+    function hidePageLoader() {
+      pageLoader.classList.add('hide');
+    }
+
+    function navigateFrame(url) {
+      if (!isAllowedAndresUrl(url)) return;
+      showPageLoader();
+      frame.src = url;
+    }
+
+    function updateConnection() {
+      if (navigator.onLine) offline.classList.remove('show');
+      else offline.classList.add('show');
+    }
+
+    window.addEventListener('message', function(event) {
+      const data = event.data || {};
+      if (data.tipo !== 'ANDRES_NAVEGAR' || !isAllowedAndresUrl(data.url)) return;
+
+      try {
+        if (event.source && event.source.postMessage) {
+          event.source.postMessage({ tipo: 'ANDRES_NAVEGACION_OK' }, '*');
+        }
+      } catch (e) {}
+
+      setTimeout(function() {
+        navigateFrame(data.url);
+      }, 20);
     });
 
-    setTimeout(() => splash.classList.add('hide'), 6000);
+    frame.addEventListener('load', function() {
+      setTimeout(function() {
+        splash.classList.add('hide');
+        hidePageLoader();
+      }, 180);
+    });
 
-    window.addEventListener('beforeinstallprompt', (event) => {
+    window.addEventListener('online', updateConnection);
+    window.addEventListener('offline', updateConnection);
+    window.addEventListener('resize', syncViewportHeight);
+    window.addEventListener('orientationchange', function() {
+      setTimeout(syncViewportHeight, 120);
+    });
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', syncViewportHeight);
+      window.visualViewport.addEventListener('scroll', syncViewportHeight);
+    }
+
+    retryButton.addEventListener('click', function() {
+      updateConnection();
+      if (navigator.onLine) {
+        showPageLoader();
+        frame.src = frame.src || APP_URL;
+      }
+    });
+
+    window.addEventListener('beforeinstallprompt', function(event) {
       event.preventDefault();
       deferredPrompt = event;
-
       if (!isStandalone()) {
         installText.textContent = 'Toca INSTALAR para abrir ANDRES sin menús del navegador.';
-        installButton.style.display = 'inline-block';
+        installButton.textContent = 'INSTALAR';
         installHelp.style.display = 'block';
       }
     });
 
-    installButton.addEventListener('click', async () => {
+    installButton.addEventListener('click', async function() {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         await deferredPrompt.userChoice;
@@ -263,27 +324,27 @@
         installHelp.style.display = 'none';
         return;
       }
-
-      if (isIOS()) {
-        alert('En iPhone/iPad: Safari → Compartir → Agregar a pantalla de inicio. Después abre ANDRES desde el icono.');
-      }
-    });
-
-    if (!isStandalone() && isIOS()) {
-      installText.textContent =
-        'En iPhone/iPad: Safari → Compartir → Agregar a pantalla de inicio. Luego abre ANDRES desde el icono.';
-      installButton.textContent = 'ENTENDIDO';
-      installButton.style.display = 'inline-block';
-      installHelp.style.display = 'block';
-    }
-
-    installButton.addEventListener('dblclick', () => {
       installHelp.style.display = 'none';
     });
 
+    if (!isStandalone() && isIOS()) {
+      installText.textContent = 'Safari → Compartir → Agregar a pantalla de inicio → abre ANDRES desde el ícono.';
+      installButton.textContent = 'ENTENDIDO';
+      installHelp.style.display = 'block';
+    }
+
+    syncViewportHeight();
+    updateConnection();
+
+    setTimeout(function() {
+      splash.classList.add('hide');
+    }, 7000);
+
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js').then(function(reg) {
+          reg.update().catch(function(){});
+        }).catch(function(){});
       });
     }
   </script>
