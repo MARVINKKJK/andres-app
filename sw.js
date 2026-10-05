@@ -1,4 +1,4 @@
-const CACHE_NAME = 'andres-shell-v2';
+const CACHE_NAME = 'andres-shell-v3';
 const APP_SHELL = [
   './manifest.webmanifest',
   './icons/icon-192.png',
