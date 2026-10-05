@@ -1,7 +1,5 @@
-const CACHE_NAME = 'andres-shell-v1';
+const CACHE_NAME = 'andres-shell-v2';
 const APP_SHELL = [
-  './',
-  './index.html',
   './manifest.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -29,12 +27,28 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // Only cache and serve files from the PWA shell's own origin.
   if (url.origin !== self.location.origin) return;
 
+  if (request.mode === 'navigate' || url.pathname.endsWith('/index.html') || url.pathname.endsWith('/andres-app/')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy)).catch(() => {});
+          return response;
+        })
+        .catch(() => caches.match('./index.html').then(r => r || caches.match('./offline.html')))
+    );
+    return;
+  }
+
   event.respondWith(
-    caches.match(request).then(cached => {
-      return cached || fetch(request).catch(() => caches.match('./offline.html'));
-    })
+    caches.match(request).then(cached =>
+      cached || fetch(request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
+        return response;
+      }).catch(() => caches.match('./offline.html'))
+    )
   );
 });
