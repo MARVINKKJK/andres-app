@@ -1,0 +1,70 @@
+ANDRES — APP SIN MENÚS DEL NAVEGADOR
+=====================================
+
+ESTE PAQUETE ES EL QUE DEBES PUBLICAR EN GITHUB PAGES.
+
+Qué hace:
+- Android: se instala como PWA y se abre en modo standalone.
+- iPhone/iPad: al agregarla a pantalla de inicio se abre como Web App independiente.
+- NO muestra la barra de direcciones ni los botones normales del navegador cuando se abre desde el icono.
+- Carga internamente tu sistema actual de Google Apps Script.
+- Mantiene la misma base de datos y la misma URL del sistema.
+- Incluye permisos delegados al iframe para geolocalización y cámara.
+- Incluye iconos y pantalla de carga institucional.
+- No requiere CMD, Android Studio ni Xcode.
+
+URL DE APPS SCRIPT UTILIZADA:
+https://script.google.com/macros/s/AKfycbx3qZbKx73FNVC9DpXNiIbj1SGtlGETRpYR2mJUIVrPndJ-Hz__J5LVzHq_yhNeczy_/exec
+
+IMPORTANTE:
+Esta es una PWA instalada, no un APK/IPA ni una publicación de App Store/Play Store.
+Visualmente, al abrirla desde el icono, funciona como una aplicación independiente sin los menús del navegador.
+
+PUBLICAR SIN CMD — GITHUB PAGES
+-------------------------------
+1. Entra a github.com desde el navegador e inicia sesión.
+2. Crea un repositorio NUEVO. Ejemplo:
+   andres-app
+3. Elige PUBLIC si la política institucional te permite que estos archivos de interfaz sean públicos.
+   Estos archivos NO contienen usuarios ni contraseñas; contienen únicamente la URL pública de tu Web App.
+4. Dentro del repositorio pulsa:
+   Add file > Upload files
+5. Sube TODO el contenido de esta carpeta:
+   index.html
+   manifest.webmanifest
+   sw.js
+   offline.html
+   carpeta icons
+6. Confirma con Commit changes.
+7. Ve a:
+   Settings > Pages
+8. En Build and deployment:
+   Source: Deploy from a branch
+   Branch: main
+   Folder: / (root)
+9. Pulsa Save.
+10. GitHub te dará una dirección HTTPS parecida a:
+    https://TU-USUARIO.github.io/andres-app/
+
+ANDROID
+-------
+1. Abre ESA URL de GitHub Pages en Chrome.
+2. Si aparece "Instalar", úsalo.
+   También puede estar en ⋮ > Instalar aplicación / Agregar a pantalla de inicio.
+3. Abre ANDRES desde el icono instalado.
+4. Ahí ya NO tendrás la barra de Chrome.
+
+IPHONE / IPAD
+-------------
+1. Abre ESA URL de GitHub Pages en Safari.
+2. Compartir.
+3. Agregar a pantalla de inicio.
+4. Activa "Abrir como app web" si tu versión de iOS lo muestra.
+5. Agregar.
+6. Abre ANDRES DESDE EL ICONO, no desde Safari.
+7. Ahí ya NO tendrás la barra normal de Safari.
+
+MUY IMPORTANTE
+--------------
+Si abres el enlace desde Chrome/Safari directamente, SÍ verás menús del navegador.
+Para verlo como app debes abrir el icono instalado en la pantalla de inicio.
