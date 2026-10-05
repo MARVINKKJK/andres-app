@@ -169,7 +169,7 @@
     <div id="frameWrap">
       <iframe
         id="andresFrame"
-        src="https://script.google.com/macros/s/AKfycbx3qZbKx73FNVC9DpXNiIbj1SGtlGETRpYR2mJUIVrPndJ-Hz__J5LVzHq_yhNeczy_/exec"
+        src="about:blank"
         allow="geolocation *; camera *; microphone *; clipboard-read *; clipboard-write *"
         referrerpolicy="strict-origin-when-cross-origin"
         title="ANDRES">
@@ -231,7 +231,11 @@
     }
 
     function isIOS() {
-      return /iphone|ipad|ipod/i.test(navigator.userAgent);
+      return /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+             (
+               navigator.platform === 'MacIntel' &&
+               navigator.maxTouchPoints > 1
+             );
     }
 
     function isAllowedAndresUrl(value) {
@@ -327,10 +331,34 @@
       installHelp.style.display = 'none';
     });
 
-    if (!isStandalone() && isIOS()) {
-      installText.textContent = 'Safari → Compartir → Agregar a pantalla de inicio → abre ANDRES desde el ícono.';
-      installButton.textContent = 'ENTENDIDO';
-      installHelp.style.display = 'block';
+    // iOS se redirige a Apps Script como primera parte; la instalación
+    // se realiza desde esa página para evitar el error 401 del iframe.
+
+    // =====================================================
+    // iOS / iPadOS
+    // =====================================================
+    //
+    // Safari bloquea con frecuencia la autenticación/cookies de Google
+    // cuando Apps Script se carga como contenido de terceros dentro de
+    // un iframe de github.io. En iPhone/iPad abrimos Apps Script como
+    // sitio de primera parte para evitar el error 401.
+    //
+    // Después, el usuario debe agregar ESA página a la pantalla de inicio.
+    // Código.gs ya incluye apple-mobile-web-app-capable=yes, por lo que
+    // al abrirse desde el icono funciona en modo app, sin la barra normal
+    // de Safari.
+    //
+    if (isIOS()) {
+      splash.classList.remove('hide');
+      installHelp.style.display = 'none';
+
+      setTimeout(function() {
+        window.location.replace(APP_URL);
+      }, 120);
+
+    } else {
+      // Android / escritorio mantienen la PWA contenedora de GitHub.
+      frame.src = APP_URL;
     }
 
     syncViewportHeight();
