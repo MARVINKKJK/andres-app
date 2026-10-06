@@ -270,11 +270,34 @@
 
     window.addEventListener('message', function(event) {
       const data = event.data || {};
-      if (data.tipo !== 'ANDRES_NAVEGAR' || !isAllowedAndresUrl(data.url)) return;
+
+      // Handshake: permite que las páginas de Apps Script sepan
+      // si realmente están dentro de la PWA de GitHub.
+      if (data.tipo === 'ANDRES_PWA_PING') {
+        try {
+          if (event.source && event.source.postMessage) {
+            event.source.postMessage(
+              { tipo: 'ANDRES_PWA_OK' },
+              '*'
+            );
+          }
+        } catch (e) {}
+        return;
+      }
+
+      if (
+        data.tipo !== 'ANDRES_NAVEGAR' ||
+        !isAllowedAndresUrl(data.url)
+      ) {
+        return;
+      }
 
       try {
         if (event.source && event.source.postMessage) {
-          event.source.postMessage({ tipo: 'ANDRES_NAVEGACION_OK' }, '*');
+          event.source.postMessage(
+            { tipo: 'ANDRES_NAVEGACION_OK' },
+            '*'
+          );
         }
       } catch (e) {}
 
